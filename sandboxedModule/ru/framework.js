@@ -8,8 +8,17 @@ var fs = require('fs'),
     vm = require('vm');
 	util = require('util');
 
+// copy of console object with log wrapper
+var my_console = util._extend({}, console);
+my_console.log = log_wrapper;
+
 // Чоздаем контекст-песочницу, которая станет глобальным контекстом приложения
-var context = { module: {}, console: console, setTimeout: setTimeout, setInterval: setInterval, clearInterval: clearInterval, util: util};
+var context = { module: {},
+                console: my_console,
+                setTimeout: setTimeout,
+                setInterval: setInterval,
+                clearInterval: clearInterval,
+                util: util};
 context.global = context;
 var sandbox = vm.createContext(context);
 
@@ -19,6 +28,7 @@ var fileName = process.argv[2];
 
 fs.readFile(fileName, function(err, src) {
   // Тут нужно обработать ошибки
+    if (err) throw err;
   
   // Запускаем код приложения в песочнице
   var script = vm.createScript(src, fileName);
@@ -27,3 +37,26 @@ fs.readFile(fileName, function(err, src) {
   // Забираем ссылку из sandbox.module.exports, можем ее исполнить,
   // сохранить в кеш, вывести на экран исходный код приложения и т.д.
 });
+
+//log file name
+const log_file = 'console_log.txt'
+
+// delete console_log file, if it exists
+fs.access(log_file, fs.F_OK, function(err){
+    if (!err) {
+        fs.unlink(log_file, function(err) { if (err) throw err; });
+    }
+});
+
+
+// print text in format <applicationName> <time> <message> into console and log-file
+function log_wrapper(text) {
+    var date = new Date()
+    var options = {hour:'numeric', minute: 'numeric', second: "numeric"}
+    time = date.toLocaleString('ru', options);
+
+    message = [fileName, time, text].join(' ');
+
+    console.log(message);
+    fs.appendFileSync(log_file, message+'\n');
+}
