@@ -18,7 +18,8 @@ var context = { module: {},
                 setTimeout: setTimeout,
                 setInterval: setInterval,
                 clearInterval: clearInterval,
-                util: util};
+                util: util,
+                require: require_wrapper};
 context.global = context;
 var sandbox = vm.createContext(context);
 
@@ -48,15 +49,30 @@ fs.access(log_file, fs.F_OK, function(err){
     }
 });
 
-
-// print text in format <applicationName> <time> <message> into console and log-file
+// print text in format <applicationName> <time> <text> into console and log-file
 function log_wrapper(text) {
-    var date = new Date()
-    var options = {hour:'numeric', minute: 'numeric', second: "numeric"}
-    time = date.toLocaleString('ru', options);
-
-    message = [fileName, time, text].join(' ');
+    var message = create_message(text);
 
     console.log(message);
     fs.appendFileSync(log_file, message+'\n');
+}
+
+// print message in format <applicationName> <time> <module_name> into log file
+// and return required module
+function require_wrapper(module_name) {
+    var message = create_message(module_name);
+
+    fs.appendFileSync(log_file, message+'\n');
+
+    return require(module_name);
+}
+
+// create message in format <applicationName> <time> <text>
+function create_message(text) {
+    var date = new Date();
+    var options = {hour:'numeric', minute: 'numeric', second: "numeric"};
+    time = date.toLocaleString('ru', options);
+
+    var message = [fileName, time, text].join(' ');
+    return message;
 }
