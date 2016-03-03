@@ -19,9 +19,12 @@ var context = { module: {},
                 setInterval: setInterval,
                 clearInterval: clearInterval,
                 util: util,
+                print_dict: print_dict,
                 require: require_wrapper};
+context_copy = util._extend({}, context); //copy for comparison
 context.global = context;
 var sandbox = vm.createContext(context);
+
 
 // Читаем исходный код приложения из файла
 // task3 (should I read from command line one appname or more?)
@@ -37,7 +40,39 @@ fs.readFile(fileName, function(err, src) {
   
   // Забираем ссылку из sandbox.module.exports, можем ее исполнить,
   // сохранить в кеш, вывести на экран исходный код приложения и т.д.
-});
+
+    //task 7: print <key> <type of object> from application export
+    exp = sandbox.module.exports;
+    console.log('\nApplication exports content:');
+    print_dict(exp);
+
+    //task 8
+    console.log('\nFunction source:\n' + exp.hello_function.toString());
+
+    print_dict(context);
+
+    compare_keys(context_copy, context);
+ });
+
+//print dict in format <key> : <value type>
+function print_dict(dict) {
+    for (key in dict) {
+        console.log(key + ": " + typeof(dict[key]));
+    }
+}
+
+//dicts comparison
+function compare_keys(dict1, dict2) {
+    console.log('Removed keys:');
+    for (key1 in dict1) {
+        if (dict2[key1] == undefined) console.log(key1)
+    }
+
+    console.log('Added keys:');
+    for (key2 in dict2) {
+        if (dict1[key2] == undefined) console.log(key2)
+    }
+}
 
 //log file name
 const log_file = 'console_log.txt'
@@ -55,6 +90,7 @@ function log_wrapper(text) {
 
     console.log(message);
     fs.appendFileSync(log_file, message+'\n');
+    //os.EOL
 }
 
 // print message in format <applicationName> <time> <module_name> into log file
