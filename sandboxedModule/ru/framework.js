@@ -12,7 +12,7 @@ var fs = require('fs'),
 var my_console = util._extend({}, console);
 my_console.log = log_wrapper;
 
-// Чоздаем контекст-песочницу, которая станет глобальным контекстом приложения
+// Cоздаем контекст-песочницу, которая станет глобальным контекстом приложения
 var context = { module: {},
                 console: my_console,
                 setTimeout: setTimeout,

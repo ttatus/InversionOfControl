@@ -1,0 +1,10 @@
+application.js 18:36:57 crypto
+application.js 18:36:57 From application global context
+application.js 18:36:57 Hello friend, I`m learning Node.js here
+application.js 18:36:57 Sandbox content from application:
+application.js 18:36:58 Hello with 1s interval
+application.js 18:36:59 Hello with 1s interval
+application.js 18:37:00 Hello with 1s interval
+application.js 18:37:01 Hello with 1s interval
+application.js 18:37:02 Stop interval spam
+application.js 18:37:02 Hello from timer
